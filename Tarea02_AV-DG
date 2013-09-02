@@ -1,0 +1,790 @@
+{
+ "metadata": {
+  "name": ""
+ },
+ "nbformat": 3,
+ "nbformat_minor": 0,
+ "worksheets": [
+  {
+   "cells": [
+    {
+     "cell_type": "heading",
+     "level": 1,
+     "metadata": {},
+     "source": [
+      "Tarea 2"
+     ]
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "**Adriano Vald\u00e9s G\u00f3mez**\n",
+      "\n",
+      "**Daniel Garrido Ruiz Velasco**"
+     ]
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "**1.** \n",
+      "\n",
+      "a. Eval\u00faa la funci\u00f3n racional\n",
+      "$$\n",
+      "R(x,y)= \\textstyle \\frac{33375}{100} y^6 + x^2 (11 x^2 y^2 - y^6 - 121 y^4 - 2) + \\frac{55}{10}y^8 + \\frac{x}{2 y}\n",
+      "$$\n",
+      "en los valores (enteros) $x=77617$ y $y=33096$. \n",
+      "\n",
+      "b. Verifica tu respuesta usando precisi\u00f3n extendida (librer\u00eda `mpmath` de `sympy`), digamos, con 30, 60, y 80 d\u00edgitos.\n",
+      "\n",
+      "c. Dado que se trata de una funci\u00f3n racional, uno esperar\u00eda que $R(77617,33096)$ sea un valor racional. \u00bfQu\u00e9 valor num\u00e9rico obtienes si utilizas la librer\u00eda `Rational` de `sympy`?"
+     ]
+    },
+    {
+     "cell_type": "heading",
+     "level": 2,
+     "metadata": {},
+     "source": [
+      "Respuesta 1"
+     ]
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "**a.** Primero, definimos la funci\u00f3n $R(x,y)$, cuidando que los factores num\u00e9ricos no se eval\u00faen como enteros, sino como n\u00fameros con punto flotante:"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "def R(x,y):\n",
+      "    return 33375/100.*y**6+x**2*(11.*x**2*y**2-y**6-121.*y**4-2.)+55/10.*y**8+x/(2.*y)\n",
+      "    #los factores num\u00e9ricos llevan punto decimal, p. ej. 10.*x en lugar de 10*x"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 1
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Y guardamos los valores $x=77617$, $y=33096$ como enteros"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "x=77617\n",
+      "y=33096"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 2
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Evaluamos directamente la funci\u00f3n R(x,y) (las operaciones se realizar\u00e1n con la precisi\u00f3n que utiliza IPython *por default* para los *flotantes*):"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "print \"R(x,y) =\",R(x,y)"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "R(x,y) = -1.18059162072e+21\n"
+       ]
+      }
+     ],
+     "prompt_number": 3
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "---\n",
+      "**b.** Para poder cambiar la precisi\u00f3n, cargamos la librer\u00eda `mpmath` de `sympy`:"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "from sympy.mpmath import *"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 4
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "La precisi\u00f3n de las operaciones est\u00e1 especificada por `mp.prec` (en binario, n\u00famero de bits) y `mp.dps` (decimales, n\u00famero de d\u00edgitos). Al determinar alguna de las dos cantidades, la otra queda determinada autom\u00e1ticamente. En general, los valores de estas variables est\u00e1n relacionados por:\n",
+      "\n",
+      "$\\mathrm{mp.prec} \\approx \\log_2 (10) \\ast \\mathrm{mp.dps}$"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "print \"mp.prec =\",mp.prec\n",
+      "print \"mp.dps =\",mp.dps"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "mp.prec = 53\n",
+        "mp.dps = 15\n"
+       ]
+      }
+     ],
+     "prompt_number": 5
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Vemos que la precisi\u00f3n *por default* es de 15 decimales. Probamos a evaluar $R(x,y)$ con 30, 60 y 80 d\u00edgitos de precisi\u00f3n. Para que las operaciones se realicen con la precisi\u00f3n especificada, es necesario utilizar la funci\u00f3n ``mpf()`` para cada argumento de la funci\u00f3n:"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "mp.dps=30\n",
+      "print \"R(x,y) =\",R(mpf(x),mpf(y))"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "R(x,y) = 1.17260394005317863185883490452\n"
+       ]
+      }
+     ],
+     "prompt_number": 6
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "mp.dps=60\n",
+      "print \"R(x,y) =\",R(mpf(x),mpf(y))"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "R(x,y) = -0.827396059946821368141165095479816291999033115784384819917815\n"
+       ]
+      }
+     ],
+     "prompt_number": 7
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "mp.dps=80\n",
+      "print \"R(x,y) =\",R(mpf(x),mpf(y))"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "R(x,y) = -0.82739605994682136814116509547981629199903311578438481991781484167270969301426154\n"
+       ]
+      }
+     ],
+     "prompt_number": 8
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Los resultados cambian demasiado con la precisi\u00f3n con que se realizan las operaciones. Podemos apreciar m\u00e1s detalladamente este efecto, evaluando para ``mp.dps`` desde 1 hasta 80:"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "print \"mp.dps     R(x,y)\"\n",
+      "for n in range(80):\n",
+      "    mp.dps=n+1\n",
+      "    print n+1,\"       \",R(mpf(x),mpf(y))"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "mp.dps     R(x,y)\n",
+        "1         8.0e+34\n",
+        "2         1.2\n",
+        "3         2.6e+33\n",
+        "4         1.173\n",
+        "5         1.1726\n",
+        "6         1.1726\n",
+        "7         1.172604\n",
+        "8         -9.9035203e+27\n",
+        "9         -1.23794004e+27\n",
+        "10         -1.547425049e+26\n",
+        "11         9.6714065569e+24\n",
+        "12         1.17260394005\n",
+        "13         7.555786372591e+22\n",
+        "14         -9.4447329657393e+21\n",
+        "15         -1.18059162071741e+21\n",
+        "16         1.172603940053179\n",
+        "17         -1.8446744073709552e+19\n",
+        "18         1.15292150460684698e+18\n",
+        "19         144115188075855873.2\n",
+        "20         1.1726039400531786319\n",
+        "21         1125899906842625.1726\n",
+        "22         1.172603940053178631859\n",
+        "23         1.1726039400531786318588\n",
+        "24         1.17260394005317863185883\n",
+        "25         1.172603940053178631858835\n",
+        "26         8589934593.1726039400531786\n",
+        "27         1073741825.17260394005317863\n",
+        "28         1.172603940053178631858834905\n",
+        "29         1.1726039400531786318588349045\n",
+        "30         1.17260394005317863185883490452\n",
+        "31         1.17260394005317863185883490452\n",
+        "32         1.1726039400531786318588349045202\n",
+        "33         1.17260394005317863185883490452018\n",
+        "34         1.172603940053178631858834904520184\n",
+        "35         1.1726039400531786318588349045201837\n",
+        "36         -0.827396059946821368141165095479816292\n",
+        "37         -0.827396059946821368141165095479816292\n",
+        "38         -0.827396059946821368141165095479816292\n",
+        "39         -0.827396059946821368141165095479816291999\n",
+        "40         -0.827396059946821368141165095479816291999\n",
+        "41         -0.82739605994682136814116509547981629199903\n",
+        "42         -0.827396059946821368141165095479816291999033\n",
+        "43         -0.8273960599468213681411650954798162919990331\n",
+        "44         -0.82739605994682136814116509547981629199903312\n",
+        "45         -0.827396059946821368141165095479816291999033116\n",
+        "46         -0.8273960599468213681411650954798162919990331158\n",
+        "47         -0.82739605994682136814116509547981629199903311579\n",
+        "48         -0.827396059946821368141165095479816291999033115784\n",
+        "49         -0.8273960599468213681411650954798162919990331157844\n",
+        "50         -0.82739605994682136814116509547981629199903311578438\n",
+        "51         -0.827396059946821368141165095479816291999033115784385\n",
+        "52         -0.8273960599468213681411650954798162919990331157843848\n",
+        "53         -0.82739605994682136814116509547981629199903311578438482\n",
+        "54         -0.82739605994682136814116509547981629199903311578438482\n",
+        "55         -0.8273960599468213681411650954798162919990331157843848199\n",
+        "56         -0.82739605994682136814116509547981629199903311578438481992\n",
+        "57         -0.827396059946821368141165095479816291999033115784384819918\n",
+        "58         -0.8273960599468213681411650954798162919990331157843848199178\n",
+        "59         -0.82739605994682136814116509547981629199903311578438481991781\n",
+        "60         -0.827396059946821368141165095479816291999033115784384819917815\n",
+        "61         -0.8273960599468213681411650954798162919990331157843848199178148\n",
+        "62         -0.82739605994682136814116509547981629199903311578438481991781484\n",
+        "63         -0.827396059946821368141165095479816291999033115784384819917814842\n",
+        "64         -0.8273960599468213681411650954798162919990331157843848199178148417\n",
+        "65         -0.82739605994682136814116509547981629199903311578438481991781484167\n",
+        "66         -0.827396059946821368141165095479816291999033115784384819917814841673\n",
+        "67         -0.8273960599468213681411650954798162919990331157843848199178148416727\n",
+        "68         -0.82739605994682136814116509547981629199903311578438481991781484167271\n",
+        "69         -0.82739605994682136814116509547981629199903311578438481991781484167271\n",
+        "70         -0.8273960599468213681411650954798162919990331157843848199178148416727097\n",
+        "71         -0.82739605994682136814116509547981629199903311578438481991781484167270969\n",
+        "72         -0.827396059946821368141165095479816291999033115784384819917814841672709693\n",
+        "73         -0.827396059946821368141165095479816291999033115784384819917814841672709693\n",
+        "74         -0.82739605994682136814116509547981629199903311578438481991781484167270969302\n",
+        "75         -0.827396059946821368141165095479816291999033115784384819917814841672709693014\n",
+        "76         -0.8273960599468213681411650954798162919990331157843848199178148416727096930143\n",
+        "77         -0.82739605994682136814116509547981629199903311578438481991781484167270969301426\n",
+        "78         -0.827396059946821368141165095479816291999033115784384819917814841672709693014261\n",
+        "79         -0.8273960599468213681411650954798162919990331157843848199178148416727096930142616\n",
+        "80         -0.82739605994682136814116509547981629199903311578438481991781484167270969301426154\n"
+       ]
+      }
+     ],
+     "prompt_number": 9
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Observamos que a partir de 36 decimales de precisi\u00f3n, la respuesta es esencialmente la misma, variando solamente los decimales de precisi\u00f3n que se obtienen; ya no tenemos las oscilaciones violentas observadas para los valores de ``mp.dps`` menores a 36."
+     ]
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "---\n",
+      "**c.** En este inciso utilizaremos la librer\u00eda ``Rational`` de ``sympy``. A grandes rasgos, ``Rational(x)`` hace que ``x`` sea manejado internamente y en las operaciones como un n\u00famero racional con precisi\u00f3n arbitraria.\n",
+      "\n",
+      "Tambi\u00e9n funciona con dos argumentos; por ejemplo, ``Rational(a,b)`` representa a $\\frac{a}{b}$.\n",
+      "\n",
+      "**Nota:** hay que tener cuidado cuando se usa un flotante como argumento; ``Rational(x)`` cambia al flotante ``x`` por un entero.\n",
+      "\n",
+      "Importamos ``Rational`` desde ``sympy``:"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "from sympy import Rational"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 10
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Para que las operaciones sean realizadas por medio de n\u00fameros racionales de precisi\u00f3n arbitraria, definimos una nueva versi\u00f3n de la funci\u00f3n $R(x,y)$:"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "def R_rational(x,y):\n",
+      "    return Rational(33375,100)*y**6+x**2*(Rational(11)*x**2*y**2-y**6-Rational(121)*y**4-Rational(2))+Rational(55,10)*y**8+x/(Rational(2)*y)"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 11
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Evaluamos la nueva versi\u00f3n de la funci\u00f3n:"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "print \"R(x,y) =\",R_rational(x,y)"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "R(x,y) = -54767/66192\n"
+       ]
+      }
+     ],
+     "prompt_number": 12
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Comparamos el valor de esta versi\u00f3n de la funci\u00f3n con la versi\u00f3n original (recordemos que para la versi\u00f3n original la precisi\u00f3n qued\u00f3 establecida en 80 decimales):"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "abs(R_rational(x,y)-R(mpf(x),mpf(y)))"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "metadata": {},
+       "output_type": "pyout",
+       "prompt_number": 13,
+       "text": [
+        "0"
+       ]
+      }
+     ],
+     "prompt_number": 13
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "El resultado es cero (al menos al ejecutar el c\u00f3digo en la computadora donde lo escrib\u00ed originalmente). Esto nos dice que ambos resultados son id\u00e9nticos. Pero no siempre ocurre as\u00ed. Si realizamos esta misma diferencia para ``mp.dps`` desde 60 hasta 90, nos daremos cuenta:"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "print \"mp.dps      Diferencia\"\n",
+      "for n in range(31):\n",
+      "    mp.dps=60+n\n",
+      "    print mp.dps,\"        \",abs(R_rational(x,y)-R(mpf(x),mpf(y)))"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "mp.dps      Diferencia\n",
+        "60          0\n",
+        "61          0\n",
+        "62          0\n",
+        "63          7.59645419660783899797859381564956572337677266689595597302382399e-65\n",
+        "64          0\n",
+        "65          0\n",
+        "66          0\n",
+        "67          0\n",
+        "68          0\n",
+        "69          0\n",
+        "70          0\n",
+        "71          1.1319598848533390459386399113609739725853163997673922736978268612419377e-72\n",
+        "72          7.07474928033336903711649944600608732865822749854620171061141788276211041e-74\n",
+        "73          8.843436600416711296395624307507609160822784373182752138264272353452638006e-75\n",
+        "74          1.1054295750520889120494530384384511451028480466478440172830340441815797508e-75\n",
+        "75          1.38178696881511114006181629804806393137856005830980502160379255522697468851e-76\n",
+        "76          0\n",
+        "77          1.0795210693868055781732939828500499463895000455545351731279629337710739753953e-78\n",
+        "78          1.34940133673350697271661747856256243298687505694316896640995366721384246924413e-79\n",
+        "79          8.433758354584418579478859241016015206167969105894806040062210420086515432775808e-81\n",
+        "80          0\n",
+        "81          1.31777474290381540304357175640875237596374517279606344375972037813851803637121995e-82\n",
+        "82          0\n",
+        "83          1.0295115178936057836277904346943377937216759162469245654372815454207172159150155852e-84\n",
+        "84          1.28688939736700722953473804336792224215209489530865570679660193177589651989376948148e-85\n",
+        "85          8.043058733543795184592112771049514013450593095679098167478762073599353249336059259224e-87\n",
+        "86          0\n",
+        "87          0\n",
+        "88          0\n",
+        "89          0\n",
+        "90          0\n"
+       ]
+      }
+     ],
+     "prompt_number": 14
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Claramente, las dos versiones de la funci\u00f3n arrojan los mismos valores, o a lo m\u00e1s, tienen una diferencia cercana a $10^{\\mathrm{-mp.dps}}$."
+     ]
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "---\n",
+      "**2.** \n",
+      "\n",
+      "Eval\u00faa num\u00e9ricamente (usando herramientas de Python) la integral\n",
+      "$$\n",
+      "I_1 = \\int_0^1 \\frac{1}{\\sqrt{\\pi}} \\exp \\left( -x^2 \\right) \\, dx\n",
+      "$$"
+     ]
+    },
+    {
+     "cell_type": "heading",
+     "level": 2,
+     "metadata": {},
+     "source": [
+      "Respuesta 2"
+     ]
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Vamos a integrar num\u00e9ricamente de dos maneras distintas. Primero lo haremos con una funci\u00f3n intr\u00ednseca que lo hace todo autom\u00e1ticamente. Despu\u00e9s lo haremos con el m\u00e9todo de Simpson. Para hacer la integraci\u00f3n num\u00e9rica con el m\u00e9todo de Simpson, necesitamos dos arreglos; bueno, al menos uno: el de la funci\u00f3n evaluada en una colecci\u00f3n de puntos del dominio.\n",
+      "\n",
+      "Lo primero que hacemos es llamar a las funciones que necesitamos de la librer\u00eda scipy y pylab. "
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "from scipy.integrate import quad\n",
+      "from scipy.integrate import simps\n",
+      "from scipy import integrate\n",
+      "from pylab import *\n",
+      "%matplotlib inline"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 15
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "A continuaci\u00f3n, vamos a integrar a trav\u00e9s de la funci\u00f3n intr\u00ednseca `quad`. La cual hace alusi\u00f3n a que el m\u00e9todo est\u00e1 basado en cuadraturas.\n",
+      "\n",
+      "Definimos la funci\u00f3n que queremos integrar num\u00e9ricamente, usando la funci\u00f3n intr\u00ednseca `lambda`. "
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "x1=lambda x: (1./np.sqrt(np.pi))*np.exp(-x**2)"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 16
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Ahora le pedimos que integre entre los l\u00edmites inferior y superior; en este caso, cero y uno, para la funci\u00f3n $1/\\sqrt{\\pi}\\cdot \\exp{(-x^2)}$ "
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "r1=integrate.quad(x1,0.,1.)\n",
+      "r1"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "metadata": {},
+       "output_type": "pyout",
+       "prompt_number": 17,
+       "text": [
+        "(0.42135039647485745, 4.677929116013252e-15)"
+       ]
+      }
+     ],
+     "prompt_number": 17
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "La funci\u00f3n `quad` de la paqueter\u00eda `scipy.integrate` integra una funci\u00f3n de una variable entre dos puntos. El resultado es una `tupla`, de la cual, el primer resultado es el valor estimado de la integral, mientras que el segundo elemento, es una cota superior para el error.\n",
+      "\n",
+      "Ahora realizaremos el mismo c\u00e1lculo con el m\u00e9todo de Simpson. Para ello, generamos la colecci\u00f3n de puntos del dominio de la funci\u00f3n en el intervalo que la queremos integrar. Esto lo hacemos generando un arreglo con `np.linspace`."
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "x2=np.linspace(0,1,100000)"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 29
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Posteriormente, generamos los puntos evaluados por la funci\u00f3n. Para ello definimos `func1`, como la funci\u00f3n que queremos integrar. "
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "#definici\u00f3n de la funci\u00f3n\n",
+      "def func1(x):\n",
+      "    return (1./np.sqrt(np.pi))*np.exp(-x**2)\n",
+      "\n",
+      "#aplicamos la funci\u00f3n a los elementos del arreglo x1, para generar el arreglo y2\n",
+      "y2=func1(x2)"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 30
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Cotejamos gr\u00e1ficamente que hayamos generado, efectivamente, los puntos que quer\u00edamos, de la funci\u00f3n que queremos, sobre el dominio que queremos. "
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "plt.plot(x2,y2)\n",
+      "plt.xlabel(\"$x$\",fontsize=21)\n",
+      "plt.ylabel(\"$y=\\frac{1}{\\sqrt{\\pi}}\\exp{-x^2}$\",fontsize=18)"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "metadata": {},
+       "output_type": "pyout",
+       "prompt_number": 25,
+       "text": [
+        "<matplotlib.text.Text at 0x74008b0>"
+       ]
+      },
+      {
+       "metadata": {},
+       "output_type": "display_data",
+       "png": "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\nMjIyKu+npKSQkpJSfx9CxA9ce62ZIjxypDk4a+ZMM8NL5CSv14vX663z6/icSC6++OIz3q+pk0nh\nXCZPnsy0adMq9305ufeLL3VPqppIRJqqiAizAv7Xv4Y+fWDePIiLczoqaSy+/0d2ZmZmrV7H50Ty\nz3/+84z3ayosLIySkpLKxyUlJbjd7mplCgsLSU9PB2D//v0sWrQIl8vlU10Rqa55c8jJgZdegquu\ngr/9DW66yemoJJDYvvtveXk5Xbt2ZenSpXTq1Ik+ffqQm5tLbGzsGcuPHTuW66+/nrS0NJ/ravdf\nkTP74ANISzOJ5PHHdWCWVOc355GEhISQnZ1NamoqcXFxjBo1itjYWHJycsjJyalVXRHxTWIirF8P\nGzaYXYT373c6IgkEP9giGTRoEB06dCA5OZnk5GTi/KCDVS0SkXMrL4eHHoK5c+GNN0yCEWmwo3bn\nzZvH3LlzWbFiBXv37iU0NJQrrriiMrEkJSXRrFnjWiCvRCLim7lz4e67zRTh225zOhpxmi1ntm/Z\nsoV3330Xr9fLokWL+Oqrr2jfvj2//vWvmTJlCsGN5Ng2JRIR3338MQwfbnYU/uMfweVyOiJxii2J\npKri4mKefvppOnbsyJw5c4iIiGDhwoWENILROyUSkZo5dAhGj4YjR0wrpUMHpyMSJzTYYPuBAweY\nP38+u3btqvb76OhounTpQmZmJps3b2bgwIE88cQTNQ5ARJx34YVma5WUFLO1ylnW+Yqc0Q8mktGj\nRzN16lQuueQSUlNTmTFjBhs3bmTjxo18+OGH5kWaNeOBBx7gyJEjDR6wiDSMZs0gMxOys+H66832\n9CK++MF+qAEDBuDxeCgqKmLmzJlkZmaya9cuXC4Xzz//PAALFy7kwIEDtGvXrsEDFpGGdcMNEBMD\nw4aZqcJ//Sucd57TUUlj9oMtkqSkJB577DHatGnDM888w86dO9m/fz8HDhxgzJgxAKxZs4bx48dz\n/vnnN3jAItLwunY13Vv79pnurtJSpyOSxsynwfYDBw6wZMkSRo0addYy+/btq7ZTr5M02C5SP06c\ngGnTzLYqeXlwxRVORyQNyfZZW42ZEolI/fJ4YMwYePhhs+6kBvunih9RIqlCiUSk/m3bZtabJCbC\n3/8O6skOPH6z15aI+KcuXcy5JmVlkJwMVTbiliZOiUREfNayJbz6KqSnQ9++sGKF0xFJY6CuLRGp\n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\n7WpFRUVZ06ZNO2OZX/3qV1ZUVJQVHx9vbdiwweYI7fND12L27NlWfHy81b17d+vyyy+3Nm7c6ECU\n9vDl34VlWVZBQYEVHBxszZs3z8bo7OXLtVi+fLnVo0cP67LLLrOuuuoqewO00Q9di3379lmpqalW\nQkKCddlll1kvvvii/UHaYOzYsdbFF19sdevW7axlavq96beJpLy83OrSpYu1fft2q6yszEpISLA2\nbdpUrczChQut6667zrIsy1q7dq3Vt29fJ0JtcL5ci9WrV1uHDh2yLMv8h2rK1+Jkuauvvtr62c9+\nZr3++usORNrwfLkWX375pRUXF2eVlJRYlmW+TAORL9fikUcesR588EHLssx1CA0NtY4fP+5EuA1q\nxYoV1oYNG86aSGrzvem3e235sqZkwYIFjBkzBjDrUQ4dOsTevXudCLdB1WVtTqDxda3R9OnTGTly\nJO3bt3cgSnv4ci1effVVRowYUTlppV27dk6E2uB8uRYdO3bkq6++AuCrr76ibdu2hITY3vvf4JKT\nkysnMJ1Jbb43/TaR+LKm5ExlAvELtC5rcwKNr/8u8vPzK8fgAnWquC/Xori4mIMHD3L11VeTlJTE\nrFmz7A7TFr5ciwkTJvDJJ5/QqVMnEhISePbZZ+0Os1Gozfem36ZbX//zW9+bChyIXxp1WZsTaHy5\nFpMnT2batGmVm3t+/99IoPDlWhw/fpwNGzawdOlSjh07Rv/+/enXrx/R0dE2RGgfX67FE088QY8e\nPfB6vWzbto1BgwaxceNGWrdubUOEjUtNvzf9NpH4sqbk+2V27txJWFiYbTHapS5rcwKNL9eisLCQ\n9PR0APbv38+iRYtwuVwBN5Xcl2sRHh5Ou3btOP/88zn//PO58sor2bhxY8AlEl+uxerVq3nooYcA\n6NKlC5GRkWzdupWkpCRbY3Varb43620Ex2bHjx+3OnfubG3fvt369ttvf3Cwfc2aNQE7wOzLtfj8\n88+tLl26WGvWrHEoSnv4ci2quuOOOwJ21pYv12Lz5s3WNddcY5WXl1tHjx61unXrZn3yyScORdxw\nfLkW9913n5WRkWFZlmXt2bPHCgsLsw4cOOBEuA1u+/btPg22+/q96bctEl/WowwZMoR//etfREVF\n0bJlS1588UWHo24YdVmbE2h8uRZNhS/XIiYmhmuvvZb4+HiaNWvGhAkTiIuLczjy+ufLtfjd737H\n2LFjSUhI4MSJEzz11FOEhoY6HHn9u/nmm3n33XfZv38/4eHhZGZmcvz4caD235sBebCViIjYx29n\nbYmISOOgRCIiInWiRCIiInWiRCIiInWiRCIiInWiRCIiInXit+tIRPzFli1b+Pvf/07z5s0pKiri\n0UcfZd++fSxevJhvvvmGLl268Nvf/tbpMEVqTetIRBpQaWkpDz30EDNmzMDlcvGPf/yDjIwMxo0b\nR2ZmJrGxsezevZtDhw45HapIralFItKAsrKyeOqpp3C5XAAcPXqU3bt3c8899wAwduzYgNvXSpoe\ntUhEGtD27duJjIysfHzTTTexbds2CgsLHYxKpH5psF2kAVVNIidOnGDp0qVcc801DkYkUv+USERs\nUlhYyJdffsnAgQMrf/fNN9+wa9cuB6MSqTslEpEG8u233zJ16lRWrlwJgMfjAWDAgAGVZZ5//nn2\n7NnjSHwi9UWJRKSBLFy4kKysLAoKCjh06BDLli0jJCSE4OBgAD766CO2bdtGz549HY5UpG402C7S\nQA4ePMh9993Hj3/8Y44cOUJGRgYvvfQS69atIzIykjZt2vDggw8SEqLJk+LflEhERKRO1LUlIiJ1\nokQiIiJ1okQiIiJ1okQiIiJ1okQiIiJ1okQiIiJ1okQiIiJ1okQiIiJ18v8BDZLK8S/nsbQAAAAA\nSUVORK5CYII=\n",
+       "text": [
+        "<matplotlib.figure.Figure at 0x74fd050>"
+       ]
+      }
+     ],
+     "prompt_number": 25
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Ahora pedimos que se eval\u00fae num\u00e9ricamente la integral con el m\u00e9todo de Simpson."
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "r2=simps(y2,x2)\n",
+      "r2"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "metadata": {},
+       "output_type": "pyout",
+       "prompt_number": 32,
+       "text": [
+        "0.42135039647485756"
+       ]
+      }
+     ],
+     "prompt_number": 32
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "Analicemos la diferencia entre los dos resultados: "
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "difquadsimp=np.abs(r2-0.42135039647485745)\n",
+      "difquadsimp"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "metadata": {},
+       "output_type": "pyout",
+       "prompt_number": 22,
+       "text": [
+        "1.1102230246251565e-16"
+       ]
+      }
+     ],
+     "prompt_number": 22
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "La diferencia es del orden de $10^{-16}$. Podemos pensar que, para este caso, los dos m\u00e9todos proporcionan resultados equivalentes."
+     ]
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": [
+      "---\n",
+      "**3.** \n",
+      "\n",
+      "a. Dibuja la funci\u00f3n \n",
+      "$$\n",
+      "f(x) = x^{-1} \\cos \\left( x^{-1} \\log{x} \\right)\n",
+      "$$\n",
+      "en el intervalo [0,1].\n",
+      "\n",
+      "b. Calcula ahora el *valor num\u00e9rico* de\n",
+      "$$\n",
+      "\\lim_{\\epsilon\\to 0} \\int_\\epsilon^1 f(x) \\, dx\n",
+      "$$\n",
+      "\n",
+      "c. \u00bfC\u00f3mo podr\u00edas verificar si el valor num\u00e9rico que obtuviste es correcto en 10 decimales?"
+     ]
+    },
+    {
+     "cell_type": "heading",
+     "level": 2,
+     "metadata": {},
+     "source": [
+      "Respuesta 3"
+     ]
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [],
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    }
+   ],
+   "metadata": {}
+  }
+ ]
+}
